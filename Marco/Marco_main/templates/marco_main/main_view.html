@@ -10,7 +10,9 @@
 <style>
 .container { position:relative; }
 .imgA1 { position:absolute; top: 0px; left: 0px; z-index: 1; }
+.imgballoon { position:absolute; top: 70px; left: 20px; z-index: 3;}
 .imgB1 { position:absolute; top: 70px; left: 20px; z-index: 3;}
+
 .img-responsive {
     display: block;
     max-width: 100%;
@@ -18,52 +20,102 @@
     height: auto;
 }
 #text {
-  z-index: 100;
+  z-index: 5;
   position: absolute;
   color: black;
   font-size: 24px;
   font-weight: bold;
   left: 150px;
   top: 200px;
+  white-space: pre-wrap;
+  width:400px;
+}
+#THT {
+  z-index: 5;
+  position: absolute;
+  color: black;
+  font-size: 24px;
+  font-weight: bold;
+  left: 1150px;
+  top: 200px;
+
+}
+
+#schedule {
+  z-index: 5;
+  position: absolute;
+  color: black;
+  font-size: 24px;
+  font-weight: bold;
+  left: 1150px;
+  top: 240px;
 }
 </style>
 <body>
-    <img class="imgB1" src='static/gif/textbox.png' id="textbox" />
+    <img class='imgballoon' src='static/gif/textbox.png' id="balloon" />
+    <img class='img-responsive' src='static/gif/clear.gif' id="bg-img" />
       <p id="text">
-        Hello World!
+      </p>
+      <p id="THT">
+      </p>
+      <p id="schedule">
       </p>
 
-    <img class='img-responsive' src='static/gif/testimg3.gif' id="gif-img2" />
-
-    <h1>{{ Sensor }}</h1>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 	<script>
-            var image = document.getElementById('gif-img2');
+            var image = document.getElementById('bg-img');
             var text = document.getElementById("text");
+            var THT = document.getElementById("THT");
+            var schedule = document.getElementById("schedule");
+            var lock = "False"
+            var temp = 0
+            var camera = "555"
+            function sleep (delay) {
+               var start = new Date().getTime();
+               while (new Date().getTime() < start + delay);
+            }
             $(function (){
                 timer = setInterval(function(){
                 $.ajax({
                         type: "POST",
                         url: "{% url 'Marco_main:Marco' %}",
-                        data : {'message':'CheckSensor', 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                        data : {'message': camera, 'textlock': lock, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
                         dataType : "json",
                         success:function(response){
-                            if (image.src !== response['src']) {
-                                console.log(image.src);
-                                image.src = response['Image'];
-                                }
-                            if (text.textContent !== response['text']) {
-                                text.textContent = response['text'];
+                                camera = response['camera']
 
+
+                                if (image.src != response['Backimg_src']) {
+                                    console.log(image.src);
+                                    image.src = response['Backimg'];
+                                    }
+                                if (text.textContent != response['text'] && lock == "False") {
+                                    console.log("1111")
+                                    lock = "True"
+                                    text.textContent = response['text'];
+                                    
+                                    setTimeout(function() {  lock = "False" }, 10000);
+
+                                    //sleep(10000)
+                                    //lock = 0
+                                    }
+                                if (THT.textContent != response['THT']){
+                                    THT.textContent = response['THT']
                                 }
+                                if (schedule.textContent != response['schedule']){
+                                    schedule.textContent = response['schedule']
+                                }
+                                
+                                
                                 console.log("성공");
+                                temp = response
                         },
                         error: function(request, status, error){
                         console.log("실패.");
                         },
                       })
-                },1000);
+                },700);
             });
 	</script>
 </body>

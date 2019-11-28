@@ -17,7 +17,7 @@ class Marco_main(generic.TemplateView) :
         image_url = 'static/gif/testimg3.gif'
         image_src = "http://127.0.0.1:8000/" + image_url
         text_content = "안녕하세요 ㅎㅎㅎ"
-        data = {'Image': image_url, 'src': image_src, 'text':text_content }
+        data = {'Image': image_url, 'src': image_src, 'text': text_content}
         return JsonResponse(data)
 
 
